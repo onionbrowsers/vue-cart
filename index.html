@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <style>
+        @keyframes move {
+            0%{
+                top: 250px;
+            }
+            100%{
+                top: 0px;
+            }
+        }
+        .el{
+            overflow: hidden;
+        }
+        .el-inner{
+            position: relative;
+            top: 250px;
+            animation: move 1s linear;
+            animation-fill-mode:forwards;
+        }
+        .goods:nth-of-type(2) .el .el-inner{
+            animation-delay: 0.1s
+        }
+        .goods:nth-of-type(3) .el .el-inner{
+            animation-delay: 0.2s
+        }
+        .goods:nth-of-type(4) .el .el-inner{
+            animation-delay: 0.3s
+        }
+        .goods:nth-of-type(5) .el .el-inner{
+            animation-delay: 0.4s
+        }
+        .goods:nth-of-type(6) .el .el-inner{
+            animation-delay: 0.5s
+        }
+        #app{
+            margin:0 
+        }
+        #app .goods{
+            text-align: center;
+        }
+        #app .goods img{
+            height: 250px ;
+            width: 100%;
+        }
+        #app .goods h1{
+            font-size: 30px;
+            
+        }
+        #app .goods span{
+            font-size: 25px;
+            float: right;
+        }
+        #app .goods button{
+            margin-left:70px;
+            background: #ffee76;
+            box-shadow: 0px 3px 5px #ffee76;
+            outline: 0;
+            border-radius: 5px;
+            border: 0;
+            width: 120px;
+            height: 25px;
+        }
+        #app .goods button:hover {
+            background: #ffd700;
+        }
+        #app .goods button:disabled{
+            background: #eee;
+            cursor: auto;
+            box-shadow: 0px 3px 5px #aaa;
+        }
+        #app .cart .icon{
+            position: fixed;
+            top: 30%;
+            left: 0;
+        }
+        #app .cart .icon span{
+            font-size: 30px;
+            color: #f40;
+        }
+        #app .cart{
+            position: relative;
+            left:-100%;
+            height: 100vh;
+            width: 30%;
+            background-color:#eee;
+            transition: all 0.5s linear;
+        }
+        #app .cart .content{
+            width: 100%;
+            position: absolute;
+            bottom: 10px;
+            text-align: center;
+        }
+        #app .cart .content .buy{
+            /* margin: 0 auto;  */
+            background: #aaa;
+            box-shadow: 0px 3px 5px #eee;
+            outline: 0;
+            border-radius: 5px;
+            border: 0;
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            font-size: 20px;
+            color: #fff;
+        }
+        #app .cart .content .buy:hover{
+            background: #333;
+        }
+        #app .cart .box{
+            position: absolute;
+            width: 100%;
+        }
+        #app .cart .box .cart-item{
+            width: 100%;
+            height: 70px;
+            font-size:20px;
+            display: flex;
+        }
+        #app .cart .box .cart-item span{
+            flex: 5.5;
+        }
+        #app .cart .box .cart-item button{
+            margin-right: 7px;
+            border: 0;
+            flex: 1.5;
+            text-align: center;
+            border-radius: 5px;
+            height: 30px;
+            background-color: #aaa;
+            box-shadow: 0px 3px 5px black;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app" class="row">
+        <div v-for="(ele,index) in product" :class="['col-xs-4','goods']">
+            <div class="el">
+                <img :src="'./'+ele.id+'.jpg'" alt="" class="el-inner">
+            </div>
+            <h1>{{ele.name}}</h1>
+            <button :disabled="ele.qty" @click="addToCart(ele)">
+                    <template v-if="!ele.qty"><i class="glyphicon glyphicon-plus"></i> Add To Cart </template>
+                    <template v-else><i class="glyphicon glyphicon-ok"></i> in Cart </template>
+            </button>
+            <span>{{ele.price}} $</span>
+        </div>   
+        <div class="cart">
+            <div class="icon">
+                <span class="glyphicon glyphicon-shopping-cart" @mouseenter = 'changeCart'></span>
+            </div>
+            <div class="box">
+                <div class="cart-item" v-for="item,i in cart" v-if="item.qty > 0">
+                    <span>{{ item.qty }} &times; {{ item.name }} {{ item.price }} $ </span>
+                    <button @click="item.qty += 1">+1</button>
+                    <button v-if="item.qty > 1" @click="(item.qty > 1) ? item.qty -= 1 : ''">-1</button>
+                    <button @click="del(i, item.id)">clear</button>
+                </div>
+            </div>
+            <div class="content">
+                <h4>总数：{{count}}</h4>
+                <h4>总价：{{total}}</h4>
+                <button class="buy">购 买</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        var vm = new Vue({
+                        el:'#app',
+                        data:{
+                            product:[{
+                                id:1,
+                                name:'mac',
+                                price: 4999 
+                            },{
+                                id:2,
+                                name:'iPhone X',
+                                price: 5999 
+                            },{
+                                id:3,
+                                name:'iTouch',
+                                price: 3266
+                            },{
+                                id:4,
+                                name:'AirPods',
+                                price: 1288
+                            },{
+                                id:5,
+                                name:'iPhone 8',
+                                price: 3699 
+                            },{
+                                id:6,
+                                name:'macmini',
+                                price: 2688 
+                            }],
+                            cart:[]
+                        },
+                        computed:{
+                            count: function() {
+                                return this.cart.reduce(function(n, cart) {
+                                    console.log(cart)
+                                    return cart.qty + n;
+                                }, 0)
+                            },
+                            total: function() {
+                                return this.cart.reduce(function(n, cart) {
+                                    return cart.price * cart.qty + n
+                                }, 0).toFixed(2);
+                            }
+                        },
+                        methods:{
+                            changeCart() {
+                                var oCart = document.getElementsByClassName('cart')[0]
+                                oCart.style.left = 0
+                                oCart.onmouseleave = function () {
+                                    oCart.style.left = '-100%'
+                                }
+                            },
+                            addToCart (product) {
+                                console.log(vm.cart)
+                                this.$set(product, 'qty', 1)
+                                this.cart.push(product);
+                            },
+                            unblock (id) {
+                                for (var i = 0; i < this.product.length; i++) {
+                                    if (this.product[i].id === id) {    
+                                        delete this.product[i].qty;
+                                        break;
+                                    }
+                                }
+                            },
+                            del (index, id) {
+                                this.cart.splice(index, 1);
+                                this.unblock(id);      
+                            },
+                        }
+                    })
+        
+    </script>
+</body>
+</html>
